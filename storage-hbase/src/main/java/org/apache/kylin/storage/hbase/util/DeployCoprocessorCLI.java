@@ -533,7 +533,7 @@ public class DeployCoprocessorCLI {
 
             Matcher keyMatcher;
             Matcher valueMatcher;
-            for (Map.Entry<ImmutableBytesWritable, ImmutableBytesWritable> e : tableDescriptor.getValues().entrySet()) {
+            for (Map.Entry<org.apache.hadoop.hbase.util.Bytes, org.apache.hadoop.hbase.util.Bytes> e : tableDescriptor.getValues().entrySet()) {
                 keyMatcher = HConstants.CP_HTD_ATTR_KEY_PATTERN.matcher(Bytes.toString(e.getKey().get()));
                 if (!keyMatcher.matches()) {
                     continue;

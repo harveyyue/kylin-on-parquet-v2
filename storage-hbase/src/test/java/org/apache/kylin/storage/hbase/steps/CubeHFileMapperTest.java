@@ -6,15 +6,15 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.apache.kylin.storage.hbase.steps;
 
@@ -36,7 +36,7 @@ import org.junit.Test;
 
 /**
  * @author George Song (ysong1)
- * 
+ *
  */
 public class CubeHFileMapperTest {
 
@@ -69,13 +69,23 @@ public class CubeHFileMapperTest {
         Pair<RowKeyWritable, KeyValue> p2 = result.get(1);
 
         assertEquals(key, p1.getFirst());
-        assertEquals("cf1", new String(p1.getSecond().getFamily(), StandardCharsets.UTF_8));
-        assertEquals("usd_amt", new String(p1.getSecond().getQualifier(), StandardCharsets.UTF_8));
-        assertEquals("35.43", new String(p1.getSecond().getValue(), StandardCharsets.UTF_8));
+        assertEquals("cf1", new String(copy(p1.getSecond()), StandardCharsets.UTF_8));
+        assertEquals("usd_amt", new String(copy(p1.getSecond()), StandardCharsets.UTF_8));
+        assertEquals("35.43", new String(copy(p1.getSecond()), StandardCharsets.UTF_8));
 
         assertEquals(key, p2.getFirst());
-        assertEquals("cf1", new String(p2.getSecond().getFamily(), StandardCharsets.UTF_8));
-        assertEquals("item_count", new String(p2.getSecond().getQualifier(), StandardCharsets.UTF_8));
-        assertEquals("2", new String(p2.getSecond().getValue(), StandardCharsets.UTF_8));
+        assertEquals("cf1", new String(copy(p2.getSecond()), StandardCharsets.UTF_8));
+        assertEquals("item_count", new String(copy(p2.getSecond()), StandardCharsets.UTF_8));
+        assertEquals("2", new String(copy(p2.getSecond()), StandardCharsets.UTF_8));
+    }
+
+    private byte[] copy(KeyValue kv) {
+        return copy(kv.getFamilyArray(), kv.getFamilyOffset(), kv.getFamilyLength());
+    }
+
+    private byte[] copy(byte[] array, int offset, int length) {
+        byte[] result = new byte[length];
+        System.arraycopy(array, offset, result, 0, length);
+        return result;
     }
 }

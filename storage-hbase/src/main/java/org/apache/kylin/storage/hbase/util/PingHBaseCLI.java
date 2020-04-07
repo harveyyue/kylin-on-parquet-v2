@@ -6,15 +6,15 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.apache.kylin.storage.hbase.util;
 
@@ -32,12 +32,13 @@ import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.security.token.TokenUtil;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.kylin.common.StorageURL;
 import org.apache.kylin.common.util.Bytes;
 import org.apache.kylin.storage.hbase.HBaseConnection;
 
 /**
  * @author yangli9
- * 
+ *
  */
 public class PingHBaseCLI {
 
@@ -50,7 +51,8 @@ public class PingHBaseCLI {
         if (User.isHBaseSecurityEnabled(hconf)) {
             try {
                 System.out.println("--------------Getting kerberos credential for user " + UserGroupInformation.getCurrentUser().getUserName());
-                TokenUtil.obtainAndCacheToken(hconf, UserGroupInformation.getCurrentUser());
+                Connection connection = HBaseConnection.get(StorageURL.valueOf(hbaseTable + "@hbase"));
+                TokenUtil.obtainAndCacheToken(connection, User.create(UserGroupInformation.getCurrentUser()));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.out.println("--------------Error while getting kerberos credential for user " + UserGroupInformation.getCurrentUser().getUserName());

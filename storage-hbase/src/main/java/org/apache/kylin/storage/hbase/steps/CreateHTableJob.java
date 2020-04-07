@@ -6,15 +6,15 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.apache.kylin.storage.hbase.steps;
 
@@ -26,6 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -33,6 +35,8 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.KeyValueUtil;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.SequenceFile;
@@ -55,9 +59,6 @@ import org.apache.kylin.metadata.model.IEngineAware;
 import org.apache.kylin.storage.hbase.HBaseConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  */
@@ -120,7 +121,7 @@ public class CreateHTableJob extends AbstractHadoopJob {
         CubeHTableUtil.createHTable(cubeSegment, splitKeys);
 
         // export configuration in advance to avoid connecting to hbase from spark
-        if (cubeDesc.getEngineType()== IEngineAware.ID_SPARK){
+        if (cubeDesc.getEngineType() == IEngineAware.ID_SPARK || cubeDesc.getEngineType() == IEngineAware.ID_FLINK) {
             exportHBaseConfiguration(cubeSegment.getStorageLocationIdentifier());
         }
         return 0;
@@ -131,8 +132,10 @@ public class CreateHTableJob extends AbstractHadoopJob {
         Configuration hbaseConf = HBaseConnection.getCurrentHBaseConfiguration();
         HadoopUtil.healSickConfig(hbaseConf);
         Job job = Job.getInstance(hbaseConf, hbaseTableName);
-        HTable table = new HTable(hbaseConf, hbaseTableName);
-        HFileOutputFormat3.configureIncrementalLoadMap(job, table);
+        Connection conn = HBaseConnection.get(kylinConfig.getStorageUrl());
+        HTable htable = (HTable) conn.getTable(TableName.valueOf(hbaseTableName));
+
+        HFileOutputFormat3.configureIncrementalLoadMap(job, htable.getDescriptor());
 
         logger.info("Saving HBase configuration to {}", hbaseConfPath);
         FileSystem fs = HadoopUtil.getWorkingFileSystem();
@@ -157,7 +160,7 @@ public class CreateHTableJob extends AbstractHadoopJob {
     }
 
     public static byte[][] getRegionSplitsFromCuboidStatistics(final Map<Long, Double> cubeSizeMap,
-            final KylinConfig kylinConfig, final CubeSegment cubeSegment, final Path hfileSplitsOutputFolder)
+                                                               final KylinConfig kylinConfig, final CubeSegment cubeSegment, final Path hfileSplitsOutputFolder)
             throws IOException {
 
         final CubeDesc cubeDesc = cubeSegment.getCubeDesc();
@@ -255,7 +258,7 @@ public class CreateHTableJob extends AbstractHadoopJob {
     }
 
     protected static void saveHFileSplits(final List<HashMap<Long, Double>> innerRegionSplits, int mbPerRegion,
-            final Path outputFolder, final KylinConfig kylinConfig) throws IOException {
+                                          final Path outputFolder, final KylinConfig kylinConfig) throws IOException {
 
         if (outputFolder == null) {
             logger.warn("outputFolder for hfile split file is null, skip inner region split");

@@ -39,7 +39,7 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorException;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorService;
 import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
-import org.apache.hadoop.hbase.protobuf.ResponseConverter;
+import org.apache.hadoop.hbase.shaded.protobuf.ResponseConverter;
 import org.apache.hadoop.hbase.regionserver.HRegion;
 import org.apache.hadoop.hbase.regionserver.RegionScanner;
 import org.apache.kylin.common.KylinConfig;
@@ -179,7 +179,7 @@ public class CubeVisitService extends CubeVisitProtos.CubeVisitService implement
             List<Cell> result = delegate.next();
             rowCount++;
             for (Cell cell : result) {
-                rowBytes += CellUtil.estimatedSizeOf(cell);
+                rowBytes += CellUtil.estimatedSerializedSizeOf(cell);
             }
             return result;
         }
@@ -256,7 +256,7 @@ public class CubeVisitService extends CubeVisitProtos.CubeVisitService implement
             region = (HRegion) env.getRegion();
             region.startRegionOperation();
 
-            debugGitTag = region.getTableDesc().getValue(IRealizationConstants.HTableGitTag);
+            debugGitTag = region.getTableDescriptor().getValue(IRealizationConstants.HTableGitTag);
 
             final GTScanRequest scanReq = GTScanRequest.serializer
                     .deserialize(ByteBuffer.wrap(HBaseZeroCopyByteString.zeroCopyGetBytes(request.getGtScanRequest())));

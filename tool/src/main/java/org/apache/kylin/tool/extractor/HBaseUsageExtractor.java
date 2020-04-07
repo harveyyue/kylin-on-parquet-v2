@@ -32,7 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.zookeeper.MasterAddressTracker;
-import org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher;
+import org.apache.hadoop.hbase.zookeeper.ZKWatcher;
 import org.apache.kylin.common.KylinConfig;
 import org.apache.kylin.common.util.CliCommandExecutor;
 import org.apache.kylin.common.util.OptionsHelper;
@@ -94,7 +94,7 @@ public class HBaseUsageExtractor extends AbstractInfoExtractor {
         String host = conf.get("hbase.master.info.bindAddress");
         if (host.equals("0.0.0.0")) {
             try {
-                host = MasterAddressTracker.getMasterAddress(new ZooKeeperWatcher(conf, null, null)).getHostname();
+                host = MasterAddressTracker.getMasterAddress(new ZKWatcher(conf, null, null)).getHostname();
             } catch (IOException | KeeperException io) {
                 return null;
             }

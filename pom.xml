@@ -66,15 +66,15 @@
     <kylin.version>3.0.0</kylin.version>
 
     <!-- Hadoop versions -->
-    <hadoop2.version>2.7.1</hadoop2.version>
-    <yarn.version>2.7.1</yarn.version>
+    <hadoop2.version>3.1.0</hadoop2.version>
+    <yarn.version>3.1.0</yarn.version>
 
     <!-- Hive versions -->
-    <hive.version>1.2.1</hive.version>
-    <hive-hcatalog.version>1.2.1</hive-hcatalog.version>
+    <hive.version>3.1.0</hive.version>
+    <hive-hcatalog.version>3.1.0</hive-hcatalog.version>
 
     <!-- HBase versions -->
-    <hbase-hadoop2.version>1.1.1</hbase-hadoop2.version>
+    <hbase-hadoop2.version>2.0.0</hbase-hadoop2.version>
 
     <!-- Kafka versions -->
     <kafka.version>1.0.0</kafka.version>
@@ -93,6 +93,8 @@
 
     <!-- Scala versions -->
     <scala.version>2.11.8</scala.version>
+
+    <commons-configuration.version>1.10</commons-configuration.version>
 
     <reflections.version>0.9.10</reflections.version>
 
@@ -636,7 +638,17 @@
       </dependency>
       <dependency>
         <groupId>org.apache.hbase</groupId>
+        <artifactId>hbase-mapreduce</artifactId>
+        <version>${hbase-hadoop2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hbase</groupId>
         <artifactId>hbase-client</artifactId>
+        <version>${hbase-hadoop2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hbase</groupId>
+        <artifactId>hbase-zookeeper</artifactId>
         <version>${hbase-hadoop2.version}</version>
       </dependency>
       <dependency>
@@ -679,6 +691,12 @@
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-yarn-server-resourcemanager</artifactId>
         <version>${yarn.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-configuration</groupId>
+        <artifactId>commons-configuration</artifactId>
+        <version>${commons-configuration.version}</version>
       </dependency>
 
       <!-- Calcite dependencies -->
@@ -1679,14 +1697,14 @@
       </build>
     </profile>
     <profile>
-      <id>cdh5.7</id>
+      <id>cdh60</id>
       <properties>
-        <hadoop2.version>2.6.0-cdh5.7.0</hadoop2.version>
-        <yarn.version>2.6.0-cdh5.7.0</yarn.version>
-        <hive.version>1.1.0-cdh5.7.0</hive.version>
-        <hive-hcatalog.version>1.1.0-cdh5.7.0</hive-hcatalog.version>
-        <hbase-hadoop2.version>1.2.0-cdh5.7.0</hbase-hadoop2.version>
-        <zookeeper.version>3.4.5-cdh5.7.0</zookeeper.version>
+        <hadoop2.version>3.0.0-cdh6.0.0</hadoop2.version>
+        <yarn.version>3.0.0-cdh6.0.0</yarn.version>
+        <hive.version>2.1.1-cdh6.0.0</hive.version>
+        <hive-hcatalog.version>2.1.1-cdh6.0.0</hive-hcatalog.version>
+        <hbase-hadoop2.version>2.0.0-cdh6.0.0</hbase-hadoop2.version>
+        <zookeeper.version>3.4.5-cdh6.0.0</zookeeper.version>
       </properties>
       <build>
         <plugins>
@@ -1700,90 +1718,90 @@
             </configuration>
           </plugin>
 
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-dependency-plugin</artifactId>
-      <executions>
-        <execution>
-          <id>copy-jamm</id>
-          <goals>
-            <goal>copy</goal>
-          </goals>
-          <phase>generate-test-resources</phase>
-          <configuration>
-            <artifactItems>
-              <artifactItem>
-                <groupId>com.github.jbellis</groupId>
-                <artifactId>jamm</artifactId>
-                <outputDirectory>${project.build.testOutputDirectory}
-                </outputDirectory>
-                <destFileName>jamm.jar</destFileName>
-              </artifactItem>
-            </artifactItems>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-jamm</id>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <phase>generate-test-resources</phase>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>com.github.jbellis</groupId>
+                      <artifactId>jamm</artifactId>
+                      <outputDirectory>${project.build.testOutputDirectory}
+                      </outputDirectory>
+                      <destFileName>jamm.jar</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
 
-    <plugin>
-      <groupId>org.jacoco</groupId>
-      <artifactId>jacoco-maven-plugin</artifactId>
-      <configuration>
-        <append>true</append>
-        <destFile>
-          ${sonar.jacoco.reportPaths}
-        </destFile>
-      </configuration>
-      <executions>
-        <execution>
-          <id>pre-test</id>
-          <goals>
-            <goal>prepare-agent</goal>
-          </goals>
-          <configuration>
-            <propertyName>surefireArgLine</propertyName>
-          </configuration>
-        </execution>
-        <execution>
-          <id>post-test</id>
-          <phase>test</phase>
-          <goals>
-            <goal>report</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-surefire-plugin</artifactId>
-      <version>2.21.0</version>
-      <configuration>
-        <reportsDirectory>${project.basedir}/../target/surefire-reports
-        </reportsDirectory>
-        <excludes>
-          <exclude>**/IT*.java</exclude>
-        </excludes>
-        <systemProperties>
-          <property>
-            <name>buildCubeUsingProvidedData</name>
-            <value>false</value>
-          </property>
-          <property>
-            <name>log4j.configuration</name>
-            <value>
-              file:${project.basedir}/../build/conf/kylin-tools-log4j.properties
-            </value>
-          </property>
-        </systemProperties>
-        <argLine>-javaagent:${project.build.testOutputDirectory}/jamm.jar
-          ${argLine} ${surefireArgLine}
-        </argLine>
-      </configuration>
-    </plugin>
-  </plugins>
-</build>
-</profile>
-<profile>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <configuration>
+              <append>true</append>
+              <destFile>
+                ${sonar.jacoco.reportPaths}
+              </destFile>
+            </configuration>
+            <executions>
+              <execution>
+                <id>pre-test</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+                <configuration>
+                  <propertyName>surefireArgLine</propertyName>
+                </configuration>
+              </execution>
+              <execution>
+                <id>post-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.21.0</version>
+            <configuration>
+              <reportsDirectory>${project.basedir}/../target/surefire-reports
+              </reportsDirectory>
+              <excludes>
+                <exclude>**/IT*.java</exclude>
+              </excludes>
+              <systemProperties>
+                <property>
+                  <name>buildCubeUsingProvidedData</name>
+                  <value>false</value>
+                </property>
+                <property>
+                  <name>log4j.configuration</name>
+                  <value>
+                    file:${project.basedir}/../build/conf/kylin-tools-log4j.properties
+                  </value>
+                </property>
+              </systemProperties>
+              <argLine>-javaagent:${project.build.testOutputDirectory}/jamm.jar
+                ${argLine} ${surefireArgLine}
+              </argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
 <!-- This profile adds/overrides few features of the 'apache-release'
      profile in the parent pom. -->
       <id>apache-release</id>
