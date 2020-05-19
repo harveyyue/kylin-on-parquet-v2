@@ -65,10 +65,10 @@ public class MetaDumpUtil {
     }
 
     public static void dumpAndUploadKylinPropsAndMetadata(Set<String> dumpList, KylinConfigExt kylinConfig,
-            String metadataUrl) throws IOException {
+                                                          String metadataUrl) throws IOException {
 
         try (AutoDeleteDirectory tmpDir = new AutoDeleteDirectory("kylin_job_meta", "");
-                AutoDeleteDirectory metaDir = tmpDir.child("meta")) {
+             AutoDeleteDirectory metaDir = tmpDir.child("meta")) {
             // dump metadata
             dumpResources(kylinConfig, metaDir.getFile().getAbsolutePath(), dumpList);
 
@@ -93,7 +93,7 @@ public class MetaDumpUtil {
         ResourceStore from = ResourceStore.getStore(kylinConfig);
         KylinConfig localConfig = KylinConfig.createInstanceFromUri(metaOutDir);
         ResourceStore to = ResourceStore.getStore(localConfig);
-        final String[] tolerantResources = { "/table_exd" };
+        final String[] tolerantResources = {"/table_exd"};
 
         for (String path : dumpList) {
             RawResource res = from.getResource(path);
@@ -114,7 +114,7 @@ public class MetaDumpUtil {
     public static KylinConfig loadKylinConfigFromHdfs(String uri) {
         if (uri == null)
             throw new IllegalArgumentException("StorageUrl should not be null");
-        if (!uri.contains("@hdfs"))
+        if (!(uri.contains("@hdfs") || uri.contains("@alluxio")))
             throw new IllegalArgumentException("StorageUrl should like @hdfs schema");
         logger.info("Ready to load KylinConfig from uri: {}", uri);
         StorageURL url = StorageURL.valueOf(uri);

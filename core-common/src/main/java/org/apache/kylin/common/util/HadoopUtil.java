@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,7 +57,7 @@ public class HadoopUtil {
     public static final String GLOBAL_DICT_STORAGE_ROOT = DICT_STORAGE_ROOT + "/global_dict";
     public static final String SNAPSHOT_STORAGE_ROOT = "/table_snapshot";
     public static final String TABLE_EXD_STORAGE_ROOT = ResourceStore.TABLE_EXD_RESOURCE_ROOT;
-    
+
     @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtil.class);
     private static final transient InternalThreadLocal<Configuration> hadoopConfig = new InternalThreadLocal<>();
@@ -87,6 +87,9 @@ public class HadoopUtil {
         if (StringUtils.isBlank(conf.get("hbase.fs.tmp.dir"))) {
             conf.set("hbase.fs.tmp.dir", "/tmp");
         }
+        if (StringUtils.isBlank(conf.get("fs.alluxio.impl"))) {
+            conf.set("fs.alluxio.impl", "alluxio.hadoop.FileSystem");
+        }
         //  https://issues.apache.org/jira/browse/KYLIN-3064
         conf.set("yarn.timeline-service.enabled", "false");
         return conf;
@@ -112,7 +115,7 @@ public class HadoopUtil {
     public static FileSystem getFileSystem(String path, Configuration conf) throws IOException {
         return getFileSystem(new Path(makeURI(path)), conf);
     }
-    
+
     public static FileSystem getFileSystem(Path path) {
         Configuration conf = getCurrentConfiguration();
         return getFileSystem(path, conf);
