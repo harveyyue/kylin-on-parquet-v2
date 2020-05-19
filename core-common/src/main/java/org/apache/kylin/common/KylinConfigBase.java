@@ -1257,8 +1257,8 @@ public abstract class KylinConfigBase implements Serializable {
         String url = getOptional("kylin.storage.url", "default@hbase");
 
         // for backward compatibility
-        if ("hbase".equals(url))
-            url = "default@hbase";
+        if (url.lastIndexOf('@') < 0)
+            url = "default@" + url;
 
         return StorageURL.valueOf(url);
     }
@@ -2552,7 +2552,7 @@ public abstract class KylinConfigBase implements Serializable {
     public StorageURL getJobTmpMetaStoreUrl(String project, String jobId) {
         Map<String, String> params = new HashMap<>();
         params.put("path", getJobTmpDir(project) + getNestedPath(jobId) + "meta");
-        return new StorageURL(getMetadataUrlPrefix(), getMetadataUrl().getScheme(), params);
+        return new StorageURL(getMetadataUrlPrefix(), getStorageUrl().getScheme(), params);
     }
 
     public Path getJobTmpShareDir(String project, String jobId) {
