@@ -60,29 +60,34 @@ then
     quit "Please set kylin.env.hdfs-working-dir in kylin.properties"
 fi
 
-hadoop ${hadoop_conf_param} fs -mkdir -p $WORKING_DIR
-if [ $? != 0 ]
+if [[ "${WORKING_DIR%%:*}" == "alluxio" ]]
 then
-    quit "Failed to create $WORKING_DIR. Please make sure the user has right to access $WORKING_DIR"
-fi
-
-SPARK_EVENTLOG_DIR=`bash $KYLIN_HOME/bin/get-properties.sh kylin.engine.spark-conf.spark.eventLog.dir`
-if [ -n "$SPARK_EVENTLOG_DIR" ]
-then
-    hadoop ${hadoop_conf_param} fs -mkdir -p $SPARK_EVENTLOG_DIR
+    echo "Please create alluxio $WORKING_DIR"
+else
+    hadoop ${hadoop_conf_param} fs -mkdir -p $WORKING_DIR
     if [ $? != 0 ]
     then
-        quit "Failed to create $SPARK_EVENTLOG_DIR. Please make sure the user has right to access $SPARK_EVENTLOG_DIR"
+        quit "Failed to create $WORKING_DIR. Please make sure the user has right to access $WORKING_DIR"
     fi
-fi
 
-SPARK_HISTORYLOG_DIR=`bash $KYLIN_HOME/bin/get-properties.sh kylin.engine.spark-conf.spark.history.fs.logDirectory`
-if [ -n "$SPARK_HISTORYLOG_DIR" ]
-then
-    hadoop ${hadoop_conf_param} fs -mkdir -p $SPARK_HISTORYLOG_DIR
-    if [ $? != 0 ]
+    SPARK_EVENTLOG_DIR=`bash $KYLIN_HOME/bin/get-properties.sh kylin.engine.spark-conf.spark.eventLog.dir`
+    if [ -n "$SPARK_EVENTLOG_DIR" ]
     then
-        quit "Failed to create $SPARK_HISTORYLOG_DIR. Please make sure the user has right to access $SPARK_HISTORYLOG_DIR"
+        hadoop ${hadoop_conf_param} fs -mkdir -p $SPARK_EVENTLOG_DIR
+        if [ $? != 0 ]
+        then
+            quit "Failed to create $SPARK_EVENTLOG_DIR. Please make sure the user has right to access $SPARK_EVENTLOG_DIR"
+        fi
+    fi
+
+    SPARK_HISTORYLOG_DIR=`bash $KYLIN_HOME/bin/get-properties.sh kylin.engine.spark-conf.spark.history.fs.logDirectory`
+    if [ -n "$SPARK_HISTORYLOG_DIR" ]
+    then
+        hadoop ${hadoop_conf_param} fs -mkdir -p $SPARK_HISTORYLOG_DIR
+        if [ $? != 0 ]
+        then
+            quit "Failed to create $SPARK_HISTORYLOG_DIR. Please make sure the user has right to access $SPARK_HISTORYLOG_DIR"
+        fi
     fi
 fi
 

@@ -65,7 +65,7 @@ public class OLAPSchemaFactory implements SchemaFactory {
 
         ProjectManager projectManager = ProjectManager.getInstance(config);
         KylinConfig projConfig = projectManager.getProject(project).getConfig();
-        Collection<TableDesc> tables = projectManager.listExposedTables(project, exposeMore(project));
+        Collection<TableDesc> tables = projectManager.listExposedTables(project, true);
 
         // "database" in TableDesc correspond to our schema
         // the logic to decide which schema to be "default" in calcite:

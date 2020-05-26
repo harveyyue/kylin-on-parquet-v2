@@ -48,6 +48,7 @@ function retrieveDependency() {
         source ${dir}/cached-kafka-dependency.sh
         source ${dir}/cached-spark-dependency.sh
         source ${dir}/cached-flink-dependency.sh
+        source ${dir}/cached-alluxio-dependency.sh
     else
         source ${dir}/find-hive-dependency.sh
         #retrive $hbase_dependency
@@ -60,6 +61,7 @@ function retrieveDependency() {
         source ${dir}/find-kafka-dependency.sh
         source ${dir}/find-spark-dependency.sh
         source ${dir}/find-flink-dependency.sh
+        source ${dir}/find-alluxio-dependency.sh
     fi
 
     # get hdp_version
@@ -99,10 +101,16 @@ function retrieveDependency() {
     if [ -n "${spark_dependency}" ]; then
         hadoop_dependencies=${hadoop_dependencies}:${spark_dependency}
     fi
+    if [ -n "${flink_dependency}" ]; then
+        hadoop_dependencies=${hadoop_dependencies}:${flink_dependency}
+    fi
+    if [ -n "${alluxio_dependency}" ]; then
+        hadoop_dependencies=${hadoop_dependencies}:${alluxio_dependency}
+    fi
 
     # compose KYLIN_TOMCAT_CLASSPATH
     tomcat_classpath=${tomcat_root}/bin/bootstrap.jar:${tomcat_root}/bin/tomcat-juli.jar:${tomcat_root}/lib/*
-    export KYLIN_TOMCAT_CLASSPATH=${tomcat_classpath}:${KYLIN_HOME}/conf:${KYLIN_HOME}/lib/*:${KYLIN_HOME}/ext/*:${hadoop_dependencies}:${flink_dependency}
+    export KYLIN_TOMCAT_CLASSPATH=${tomcat_classpath}:${KYLIN_HOME}/conf:${KYLIN_HOME}/lib/*:${KYLIN_HOME}/ext/*:${hadoop_dependencies}
 
     # compose KYLIN_TOOL_CLASSPATH
     export KYLIN_TOOL_CLASSPATH=${KYLIN_HOME}/conf:${KYLIN_HOME}/tool/*:${KYLIN_HOME}/ext/*:${hadoop_dependencies}

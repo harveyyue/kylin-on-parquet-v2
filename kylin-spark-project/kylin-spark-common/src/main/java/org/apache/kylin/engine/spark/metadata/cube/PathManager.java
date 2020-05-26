@@ -37,6 +37,8 @@ public final class PathManager {
 
     public static String getParquetStoragePath(CubeInstance cube, String segName, String identifier, Long cuboidId) {
         String hdfsWorkDir = cube.getConfig().getHdfsWorkingDirectory(cube.getProject());
-        return hdfsWorkDir + "parquet" + File.separator + cube.getName() + File.separator + segName + "_" + identifier + File.separator + cuboidId;
+        String path = hdfsWorkDir + "parquet" + File.separator + cube.getName() + File.separator + segName + "_" + identifier + File.separator + cuboidId;
+        logger.info(path);
+        return path;
     }
 }
