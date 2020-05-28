@@ -36,10 +36,10 @@ then
 fi
 
 if [ ! -d "$alluxio_home/lib" ]
-  then
-    echo "Optional dependency alluxio not found, if you need this; set ALLUXIO_HOME, or run bin/download-alluxio.sh"
+then
+    echo "Optional dependency alluxio not found, if you need this; please set ALLUXIO_HOME"
     echo "echo 'skip alluxio_dependency'" > ${dir}/cached-alluxio-dependency.sh
-  else
+else
     alluxio_dependency=`find -L $alluxio_home/client -name 'alluxio-*-client.jar' ! -name '*doc*' ! -name '*test*' ! -name '*sources*' ''-printf '%p:' | sed 's/:$//'`
     if [ -z "$alluxio_dependency" ]
     then
